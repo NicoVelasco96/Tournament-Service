@@ -1,5 +1,5 @@
 server:
-  port: 8082
+  port: ${PORT:8082}
 
 spring:
   application:
@@ -11,12 +11,14 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD:tbe_pass}
 
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: update
-    show-sql: false
+    show-sql: ${JPA_SHOW_SQL:true}
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          time_zone: UTC
 
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}
@@ -28,5 +30,8 @@ spring:
       enabled: true
 
 springdoc:
+  api-docs:
+    enabled: ${SPRINGDOC_API_DOCS_ENABLED:true}
   swagger-ui:
     path: /swagger-ui.html
+    enabled: ${SPRINGDOC_SWAGGER_UI_ENABLED:true}
