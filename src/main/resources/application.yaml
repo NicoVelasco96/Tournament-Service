@@ -35,3 +35,8 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     enabled: ${SPRINGDOC_SWAGGER_UI_ENABLED:true}
+
+player:
+  service:
+    url: ${PLAYER_SERVICE_URL:http://localhost:8081}
+    token: ${SERVICE_TOKEN}

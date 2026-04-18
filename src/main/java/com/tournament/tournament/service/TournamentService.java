@@ -1,5 +1,6 @@
 package com.tournament.tournament.service;
 
+import com.tournament.tournament.client.PlayerServiceClient;
 import com.tournament.tournament.dto.TournamentDTO;
 import com.tournament.tournament.messaging.TournamentEventPublisher;
 import com.tournament.tournament.model.*;
@@ -28,6 +29,9 @@ public class TournamentService implements ITournamentService {
 
     @Autowired
     private TournamentEventPublisher eventPublisher;
+
+    @Autowired
+    private PlayerServiceClient playerServiceClient;
 
     @Override
     @Transactional
@@ -79,6 +83,10 @@ public class TournamentService implements ITournamentService {
 
         if (tournament.getPlayerIds().size() >= tournament.getMaxPlayers()) {
             throw new IllegalArgumentException("El torneo está completo");
+        }
+
+        if (!playerServiceClient.playerExists(playerId)) {
+            throw new IllegalArgumentException("El jugador no existe: " + playerId);
         }
 
         tournament.getPlayerIds().add(playerId);
@@ -199,5 +207,17 @@ public class TournamentService implements ITournamentService {
 
         tournament.setStatus(TournamentStatus.OPEN);
         return toResponse(tournamentRepository.save(tournament));
+    }
+
+    @Override
+    @Transactional
+    public List<Object> getPlayersByTournament(Long tournamentId) {
+        Tournament tournament = tournamentRepository.findById(tournamentId)
+                .orElseThrow(() -> new IllegalArgumentException("Torneo no encontrado: " + tournamentId));
+
+        return tournament.getPlayerIds().stream()
+                .map(playerId -> playerServiceClient.getPlayer(playerId))
+                .filter(player -> player != null)
+                .toList();
     }
 }

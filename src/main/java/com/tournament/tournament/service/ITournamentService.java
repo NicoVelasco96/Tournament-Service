@@ -14,4 +14,5 @@ public interface ITournamentService {
     public TournamentDTO.MatchResponse reportResult(Long matchId, TournamentDTO.ReportResultRequest request);
     public List<TournamentDTO.MatchResponse> getMatchesByTournament(Long tournamentId);
     public TournamentDTO.TournamentResponse openTournament(Long tournamentId);
+    public List<Object> getPlayersByTournament(Long tournamentId);
 }

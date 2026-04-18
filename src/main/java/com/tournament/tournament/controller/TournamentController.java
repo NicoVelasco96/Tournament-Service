@@ -70,4 +70,9 @@ public class TournamentController {
     public ResponseEntity<String> handleIllegalArgument(IllegalArgumentException ex) {
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
+
+    @GetMapping("/{id}/players")
+    public ResponseEntity<List<Object>> getPlayers(@PathVariable Long id) {
+        return ResponseEntity.ok(tournamentService.getPlayersByTournament(id));
+    }
 }
