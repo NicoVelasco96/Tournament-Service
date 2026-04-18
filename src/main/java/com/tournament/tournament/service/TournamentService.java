@@ -53,6 +53,7 @@ public class TournamentService implements ITournamentService {
     }
 
     @Override
+    @Transactional
     public TournamentDTO.TournamentResponse getById(Long id) {
         return tournamentRepository.findById(id)
                 .map(this::toResponse)
@@ -60,6 +61,7 @@ public class TournamentService implements ITournamentService {
     }
 
     @Override
+    @Transactional
     public List<TournamentDTO.TournamentResponse> getByStatus(TournamentStatus status) {
         return tournamentRepository.findByStatus(status)
                 .stream()
