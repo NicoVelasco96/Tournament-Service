@@ -32,8 +32,9 @@ spring:
 springdoc:
   api-docs:
     enabled: ${SPRINGDOC_API_DOCS_ENABLED:true}
+    path: /v3/api-docs
   swagger-ui:
-    path: /swagger-ui.html
+    path: /api/docs
     enabled: ${SPRINGDOC_SWAGGER_UI_ENABLED:true}
 
 player:
