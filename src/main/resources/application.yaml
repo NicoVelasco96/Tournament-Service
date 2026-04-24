@@ -41,3 +41,6 @@ player:
   service:
     url: ${PLAYER_SERVICE_URL:http://localhost:8081}
     token: ${SERVICE_TOKEN}
+
+jwt:
+  secret: ${JWT_SECRET:supersecretkey_changeinproduction_minimum256bits!!}

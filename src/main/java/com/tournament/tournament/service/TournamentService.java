@@ -141,6 +141,9 @@ public class TournamentService implements ITournamentService {
         match.setFinishedAt(LocalDateTime.now());
         matchRepository.save(match);
 
+        eventPublisher.publishMatchFinished(match.getId(), request.getWinnerId(),
+                request.getWinnerId().equals(match.getPlayer1Id()) ? match.getPlayer2Id() : match.getPlayer1Id());
+
         Tournament tournament = match.getTournament();
 
         if (bracketGeneratorService.isRoundComplete(tournament, match.getRound())) {

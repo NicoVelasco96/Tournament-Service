@@ -25,4 +25,12 @@ public class TournamentEventPublisher {
         rabbitTemplate.convertAndSend("tournament.exchange", "tournament.finished", message);
         log.info("Evento TOURNAMENT_FINISHED publicado para torneo {}, campeón: {}", tournamentId, championId);
     }
+
+    public void publishMatchFinished(Long matchId, Long winnerId, Long loserId) {
+        String message = String.format(
+                "{\"matchId\": %d, \"winnerId\": %d, \"loserId\": %d, \"event\": \"MATCH_FINISHED\"}",
+                matchId, winnerId, loserId);
+        rabbitTemplate.convertAndSend("tournament.exchange", "match.finished", message);
+        log.info("Evento MATCH_FINISHED publicado — match: {}, winner: {}, loser: {}", matchId, winnerId, loserId);
+    }
 }
