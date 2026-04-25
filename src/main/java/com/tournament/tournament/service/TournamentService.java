@@ -1,5 +1,6 @@
 package com.tournament.tournament.service;
 
+import com.tournament.tournament.client.PaymentServiceClient;
 import com.tournament.tournament.client.PlayerServiceClient;
 import com.tournament.tournament.dto.TournamentDTO;
 import com.tournament.tournament.messaging.TournamentEventPublisher;
@@ -33,11 +34,38 @@ public class TournamentService implements ITournamentService {
     @Autowired
     private PlayerServiceClient playerServiceClient;
 
+    @Autowired
+    private PaymentServiceClient paymentServiceClient;
+
     @Override
     @Transactional
     public TournamentDTO.TournamentResponse create(TournamentDTO.CreateRequest request) {
         if (tournamentRepository.existsByNameAndStatus(request.getName(), TournamentStatus.OPEN)) {
             throw new IllegalArgumentException("Ya existe un torneo abierto con ese nombre");
+        }
+
+        String plan = paymentServiceClient.getSubscriptionPlan(request.getOrganizerId());
+
+        if ("FREE".equals(plan)) {
+            long activeTournaments = tournamentRepository
+                    .countByOrganizerIdAndStatusIn(request.getOrganizerId(),
+                            List.of(TournamentStatus.DRAFT, TournamentStatus.OPEN, TournamentStatus.IN_PROGRESS));
+            if (activeTournaments >= 1) {
+                throw new IllegalArgumentException("El plan FREE solo permite 1 torneo activo. Actualizá tu plan para crear más torneos.");
+            }
+            if (request.getMaxPlayers() > 8) {
+                throw new IllegalArgumentException("El plan FREE solo permite hasta 8 jugadores por torneo.");
+            }
+        } else if ("PRO".equals(plan)) {
+            long activeTournaments = tournamentRepository
+                    .countByOrganizerIdAndStatusIn(request.getOrganizerId(),
+                            List.of(TournamentStatus.DRAFT, TournamentStatus.OPEN, TournamentStatus.IN_PROGRESS));
+            if (activeTournaments >= 5) {
+                throw new IllegalArgumentException("El plan PRO solo permite 5 torneos activos. Actualizá tu plan para crear más torneos.");
+            }
+            if (request.getMaxPlayers() > 32) {
+                throw new IllegalArgumentException("El plan PRO solo permite hasta 32 jugadores por torneo.");
+            }
         }
 
         Tournament tournament = Tournament.builder()
@@ -48,7 +76,7 @@ public class TournamentService implements ITournamentService {
                 .build();
 
         Tournament saved = tournamentRepository.save(tournament);
-        log.info("Torneo creado: {}", saved.getName());
+        log.info("Torneo creado: {} (plan: {})", saved.getName(), plan);
         return toResponse(saved);
     }
 
